@@ -55,10 +55,7 @@ The workflow covers:
 
 ### 📊 Visual: Class Distribution
 
-
-```id="viz1"
-![Class Distribution](your-image-link-here)
-```
+![Class Distribution](https://raw.githubusercontent.com/23f2005144/comment-category-classification/main/Class%20Distribution.png)
 
 ---
 
@@ -96,28 +93,23 @@ Models trained under a consistent pipeline:
 ---
 
 ### 📊 Visual: Model Performance Comparison
-
-
-```id="viz2"
-![Model Comparison](your-image-link-here)
-```
+![Model Comparison](https://raw.githubusercontent.com/23f2005144/comment-category-classification/main/Model%20Performance%20Comparison.png)
 
 ---
 
 ## 📊 Evaluation
 
-### 🎯 Metric
-
+### 🎯 Metric  
 **Macro F1 Score**
 
-* Accounts for class imbalance
-* Treats all classes equally
+- Accounts for class imbalance  
+- Treats all classes equally  
 
-### 🏆 Final Score
+### 📈 Validation Performance  
+**Macro F1: 0.835**  
 
-**Macro F1: 0.82**
-
----
+### 🏆 Final Submission Score  
+**Macro F1: 0.82**  
 
 ## ⚔️ Challenges & Observations
 
@@ -178,12 +170,9 @@ Models trained under a consistent pipeline:
 
 ## 📂 Repository Structure
 
-```id="viz3"
-.
-├── 23f2005144-notebook.ipynb   # Complete workflow
-├── submission.csv              # Final predictions
-└── README.md                   # Documentation
-```
+├── [23f2005144-notebook.ipynb](./23f2005144-notebook.ipynb)   # Complete workflow  
+├── [submission.csv](./submission.csv)                         # Final predictions  
+└── README.md                                                  # Documentation  
 
 ---
 
