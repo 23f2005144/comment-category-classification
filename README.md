@@ -44,12 +44,13 @@ The workflow covers:
 
 ---
 
-### 🔹 Exploratory Data Analysis
+### 🔹 Exploratory Data Analysis  
 
-* 📊 Feature distributions and outliers
-* ⚖️ Class imbalance analysis
-* 📝 Review of sample comments
-* 🔗 Relationships between features and labels
+- 📊 **Univariate Analysis**: feature distributions, outliers, and descriptive statistics  
+- 🔗 **Bivariate & Multivariate Analysis**: relationships between features and target variable  
+- ⚖️ **Class Distribution Analysis**: identification of class imbalance  
+- 📝 **Text Analysis**: review of sample comments and linguistic patterns  
+- ☁️ **WordClouds**: top words across entire dataset and across individual classes
 
 ---
 
@@ -59,36 +60,56 @@ The workflow covers:
 
 ---
 
-### 🔹 Feature Engineering
+### 🔹 Feature Engineering  
 
-* 📝 Text-based features (length, word count)
-* ⏱️ Temporal feature extraction
-* 📉 Log transformation
-* ⚖️ Yeo-Johnson normalization
-* 🔍 Mutual Information for feature selection
+- 📝 **Text-based features**: comment length, word count, average word length  
+- ⏱️ **Temporal features**: extracted hour and month  
+  - Applied **sine-cosine transformation** to capture cyclic patterns  
+
+- 🔁 **Zero-inflated features**  
+  - Identified features with excessive zeros  
+  - Converted into **binary indicators** to capture presence/absence  
+
+- 📉 **Handling skewness**  
+  - Evaluated **log transformation** and **Yeo-Johnson transformation**  
+  - **Yeo-Johnson selected** as it reduced skewness more effectively  
+
+- 🔍 **Feature Selection & Comparison**  
+  - Used **Mutual Information (MI)** for feature importance  
+  - Compared **raw vs transformed features separately**  
+  - **Transformed features slightly outperformed** and were retained  
+
+- 🔗 **Final Feature Set**  
+  - Transformed numerical features  
+  - Word-level TF-IDF  
+  - Character-level TF-IDF (`char_wb`)
 
 ---
 
-### 🔹 Text Representation
+### 🔹 Text Representation  
 
-#### 📌 Word-Level TF-IDF
+- Built TF-IDF features using both **word-level** and **character-level (`char_wb`) analyzers**  
 
-* Tuned n-grams and vocabulary
+#### 📌 Word-Level TF-IDF  
+- Tuned **n-gram range**, **min_df**, **max_df**, and **sublinear TF scaling**  
+- Captures semantic and contextual word patterns  
 
-#### 🔬 Character-Level TF-IDF (`char_wb`)
+#### 🔬 Character-Level TF-IDF (`char_wb`)  
+- Tuned **n-grams**, **min_df**, and **max_df**  
+- Captures subword patterns and improves robustness to noisy text  
 
-* Captures subword patterns
-* Handles noisy and inconsistent text
+- 🔧 Both vectorizers were **independently tuned and optimized**  
+- 📊 Final feature space consisted of **~125K TF-IDF features**  
 
 ---
 
-### 🔹 Modeling
+### 🔹 Modeling & Tuning  
 
-Models trained under a consistent pipeline:
+Models were trained under a consistent pipeline and **systematically tuned**:
 
-* Logistic Regression
-* Linear SVM (LinearSVC)
-* LightGBM Classifier
+- **Logistic Regression** → tuned using RandomizedSearchCV (regularization, tolerance, class weights)  
+- **Linear SVM (LinearSVC)** → tuned for regularization and class weights  
+- **LightGBM Classifier** → manually tuned across multiple parameter combinations  
 
 ---
 
@@ -97,9 +118,26 @@ Models trained under a consistent pipeline:
 
 ---
 
-## 📊 Evaluation
+## 🔎 Evaluation Analysis  
 
-### 🎯 Metric  
+- Evaluated model performance using **classification report**, **confusion matrix**, and **precision-recall (PR) curves**  
+
+- 📊 **Classification Report**  
+  - Analyzed **precision, recall, and F1-score per class**  
+  - Helped identify performance gaps, especially in **minority classes**  
+
+- 🔁 **Confusion Matrix**  
+  - Provided a clear view of **class-wise predictions and misclassifications**  
+  - Useful for understanding where the model was confusing similar categories  
+
+- 📉 **Precision-Recall (PR) Curves**  
+  - Focused on **minority classes**, where performance is harder to capture  
+  - Helped analyze the **precision–recall trade-off** under class imbalance  
+
+- ⚠️ **ROC Curve not used**  
+  - Dropped due to **large number of true negatives**, which can make ROC curves overly optimistic in imbalanced settings  
+
+### 🎯 Evaluation Metric  
 **Macro F1 Score**
 
 - Accounts for class imbalance  
@@ -111,50 +149,51 @@ Models trained under a consistent pipeline:
 ### 🏆 Submission Score (Public Leaderboard)  
 **Macro F1: 0.8344**  
 
-## ⚔️ Challenges & Observations
+## ⚔️ Challenges & Observations  
 
-### ⚖️ Class Imbalance
-
-* Some categories had significantly fewer samples
-* Addressed by using **Macro F1-score** instead of accuracy
-
----
-
-### 📝 Noisy Text Data
-
-* Informal language, inconsistencies, and variations
-* Improved robustness using **character-level TF-IDF**
+### ⚖️ Class Imbalance  
+- Some categories had significantly fewer samples  
+- Addressed using **class weight tuning** to penalize minority classes  
+- Improved recall for minority classes, with a trade-off in precision which was balanced to achieve a good macro f1 score 
 
 ---
 
-### 📉 Skewed Feature Distributions
-
-* Certain numerical features were highly skewed
-* Applied **log and Yeo-Johnson transformations**
-
----
-
-### 🔍 Feature Selection
-
-* Not all engineered features contributed equally
-* Used **Mutual Information** to identify useful signals
+### 📝 Noisy Text Data  
+- Informal language, inconsistencies, and variations  
+- Improved robustness using **character-level TF-IDF**  
 
 ---
 
-### ⚙️ Model Trade-offs
-
-* Linear models performed strongly on sparse data
-* Boosting methods required careful tuning to remain competitive
+### 📉 Skewed Feature Distributions  
+- Numerical features showed strong skewness  
+- Evaluated both **log transformation** and **Yeo-Johnson transformation**  
+- **Yeo-Johnson provided better normalization** and was selected  
 
 ---
 
-## 🧩 Key Insights
+### 🔍 Feature Selection  
+- Used **Mutual Information (MI)** to evaluate feature importance  
+- Compared **raw vs transformed features**  
+- **Transformed features slightly outperformed** and were retained  
 
-* Feature engineering significantly impacted performance
-* Character-level TF-IDF improved generalization
-* Linear models are highly effective for text classification
-* Evaluation metric choice directly affects model selection
+---
 
+### ⚙️ Model Trade-offs  
+- Linear models performed strongly on high-dimensional sparse features  
+- Extensive **hyperparameter tuning** was performed across models  
+- Trade-off between **capturing minority class patterns** and **risk of overfitting**  
+- Slight overfitting observed on training/validation was **intentional to improve Macro F1**  
+- Final model generalized well, with **consistent or slightly improved performance on leaderboard data**
+
+---
+
+## 🧩 Key Insights  
+
+- Feature engineering significantly **improved model performance**  
+- Character-level TF-IDF helped capture **minority class patterns** more effectively  
+- LightGBM outperformed linear models by capturing both **linear and non-linear relationships**  
+- Focus was on balancing **precision and recall**, especially for minority classes, under the Macro F1 metric
+  
 ---
 
 ## 🛠️ Tech Stack  
@@ -176,22 +215,22 @@ Models trained under a consistent pipeline:
 
 ---
 
-## 🌟 Summary
+## 🌟 Summary  
 
-A structured machine learning workflow for text classification, with focus on:
+A structured end-to-end machine learning pipeline for multiclass text classification, with emphasis on:
 
-* Data understanding
-* Feature engineering
-* Consistent evaluation
-
----
-
-## 💡 Notes for Reviewers
-
-* The notebook contains full experimentation and intermediate results
-* Visualizations and comparisons are included within the workflow
-* Emphasis is placed on **decision-making and reasoning at each step**
+- Data understanding and comprehensive exploratory analysis  
+- Advanced feature engineering, including transformations and feature selection  
+- Robust text representation using word-level and character-level TF-IDF  
+- Systematic model tuning and comparison across linear and boosting models  
+- Careful evaluation using class-wise metrics and precision-recall analysis  
 
 ---
-* Review your **actual graphs and pick the best 2–3**
-* Or turn this into a **GitHub Pages portfolio website layout** (that’s a big upgrade)
+
+## 💡 Notes for Reviewers  
+
+- The notebook contains full experimentation, including feature comparisons and model tuning  
+- Evaluation includes classification reports, confusion matrices, and PR curve analysis  
+- Emphasis is placed on **data-driven decision-making and trade-offs at each stage of the pipeline**
+
+---
