@@ -1,6 +1,6 @@
 # 🧠 Comment Category Prediction Challenge
 
-### 📌 Multiclass Text Classification | End-to-End ML Case Study
+### 📌 Multiclass Text Classification | End-to-End ML Project
 
 ![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)
 ![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-ML-orange?logo=scikit-learn)
