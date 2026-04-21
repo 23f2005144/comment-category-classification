@@ -8,7 +8,7 @@
 ![NLP](https://img.shields.io/badge/Task-NLP-purple)
 ![Text Classification](https://img.shields.io/badge/Problem-Multiclass--Classification-red)
 ![Status](https://img.shields.io/badge/Status-Completed-brightgreen)
-![Macro F1](https://img.shields.io/badge/Macro%20F1-0.82-blue)
+![Macro F1](https://img.shields.io/badge/Macro%20F1-0.83-blue)
 
 ---
 
