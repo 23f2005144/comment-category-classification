@@ -55,7 +55,6 @@ The workflow covers:
 
 ### 📊 Visual: Class Distribution
 
-*(Add your plot here)*
 
 ```id="viz1"
 ![Class Distribution](your-image-link-here)
@@ -98,7 +97,6 @@ Models trained under a consistent pipeline:
 
 ### 📊 Visual: Model Performance Comparison
 
-*(Add your comparison chart here)*
 
 ```id="viz2"
 ![Model Comparison](your-image-link-here)
@@ -182,9 +180,9 @@ Models trained under a consistent pipeline:
 
 ```id="viz3"
 .
-├── notebook.ipynb        # Complete workflow
-├── submission.csv        # Final predictions
-└── README.md             # Documentation
+├── 23f2005144-notebook.ipynb   # Complete workflow
+├── submission.csv              # Final predictions
+└── README.md                   # Documentation
 ```
 
 ---
