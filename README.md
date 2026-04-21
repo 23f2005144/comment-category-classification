@@ -208,9 +208,9 @@ Models were trained under a consistent pipeline and **systematically tuned**:
 
 ## 📂 Repository Structure
 
-├── [23f2005144-notebook.ipynb](./23f2005144-notebook.ipynb)   # Complete workflow  
-├── [submission.csv](./submission.csv)                         # Final predictions  
-└── README.md                                                  # Documentation  
+├── [23f2005144-comment-classification-notebook.ipynb](./23f2005144-comment-classification-notebook.ipynb)   # Complete workflow  
+├── [submission.csv](./submission.csv)                                                                       # Final predictions  
+└── [README.md](./README.md)                                                                                 # Documentation  
 
 ---
 
