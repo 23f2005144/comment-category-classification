@@ -105,11 +105,11 @@ Models trained under a consistent pipeline:
 - Accounts for class imbalance  
 - Treats all classes equally  
 
-### 📈 Validation Performance  
-**Macro F1: 0.835**  
+### 📈 Validation Score  
+**Macro F1: 0.8350**  
 
-### 🏆 Final Submission Score  
-**Macro F1: 0.82**  
+### 🏆 Submission Score (Public Leaderboard)  
+**Macro F1: 0.8344**  
 
 ## ⚔️ Challenges & Observations
 
