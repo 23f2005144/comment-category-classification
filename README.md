@@ -2,13 +2,12 @@
 
 ### 📌 Multiclass Text Classification | End-to-End ML Project
 
-![Python](https://img.shields.io/badge/Python-3.x-blue?logo=python)
-![Scikit-Learn](https://img.shields.io/badge/Scikit--Learn-ML-orange?logo=scikit-learn)
-![LightGBM](https://img.shields.io/badge/LightGBM-GradientBoosting-green)
-![NLP](https://img.shields.io/badge/Task-NLP-purple)
-![Text Classification](https://img.shields.io/badge/Problem-Multiclass--Classification-red)
+![Project](https://img.shields.io/badge/Project-ML%20Pipeline-blue)
+![Type](https://img.shields.io/badge/Type-NLP%20Classification-yellow)
+![Problem](https://img.shields.io/badge/Problem-Multiclass%20Text%20Classification-red)
+![Approach](https://img.shields.io/badge/Approach-TFIDF%20%2B%20Feature%20Engineering-violet)
+![Metric](https://img.shields.io/badge/Metric-Macro%20F1%200.8344-teal)
 ![Status](https://img.shields.io/badge/Status-Completed-brightgreen)
-![Macro F1](https://img.shields.io/badge/Macro%20F1-0.83-blue)
 
 ---
 
