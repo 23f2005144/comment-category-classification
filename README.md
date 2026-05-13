@@ -38,6 +38,26 @@ The pipeline includes:
 
 ---
 
+## Pipeline Overview
+
+```text
+Raw Comments + Metadata
+           ↓
+EDA & Text Analysis
+           ↓
+Feature Engineering
+           ↓
+TF-IDF + Engineered Features
+           ↓
+High-Dimensional Sparse Matrix
+           ↓
+Model Training & Tuning
+           ↓
+Evaluation & Interpretation
+```
+
+---
+
 ## Problem Context
 
 The dataset presented several practical NLP challenges:
@@ -362,6 +382,16 @@ while engineered numerical features provided additional structural signals compl
 * LightGBM benefited from combining sparse TF-IDF features with engineered numerical features
 * Precision-Recall analysis was significantly more informative than ROC analysis under imbalance
 * Careful trade-off balancing between minority recall and precision was critical for optimizing Macro F1
+
+---
+
+## Lessons Learned
+
+- Character-level TF-IDF representations were especially effective for improving robustness on noisy minority-class samples
+- Sparse linear models remained highly competitive despite the availability of more complex nonlinear approaches
+- Evaluation metric selection significantly influenced optimization strategy under heavy class imbalance
+- Incremental improvements in feature engineering produced larger gains than aggressively increasing model complexity
+- Alignment between EDA observations and downstream feature importance analysis improved confidence in feature design decisions
 
 ---
 
