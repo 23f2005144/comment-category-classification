@@ -1,235 +1,432 @@
-# 🧠 Comment Category Prediction Challenge
+# Multiclass Comment Classification Pipeline
 
-### 📌 Multiclass Text Classification | End-to-End ML Project
+High-dimensional NLP classification pipeline for noisy user-generated comments using TF-IDF representations, feature engineering, and class-imbalance-aware modeling.
 
-![Project](https://img.shields.io/badge/Project-ML%20Pipeline-blue)
-![Type](https://img.shields.io/badge/Type-NLP%20Classification-yellow)
-![Problem](https://img.shields.io/badge/Problem-Multiclass%20Text%20Classification-red)
-![Approach](https://img.shields.io/badge/Approach-TFIDF%20%2B%20Feature%20Engineering-violet)
-![Metric](https://img.shields.io/badge/Metric-Macro%20F1%200.8344-teal)
+![Project](https://img.shields.io/badge/Project-NLP%20Pipeline-blue)
+![Task](https://img.shields.io/badge/Task-Multiclass%20Classification-orange)
+![Approach](https://img.shields.io/badge/Approach-TFIDF%20%2B%20Feature%20Engineering-purple)
+![Model](https://img.shields.io/badge/Best%20Model-LightGBM-green)
+![Metric](https://img.shields.io/badge/Macro%20F1-0.8344-teal)
 ![Status](https://img.shields.io/badge/Status-Completed-brightgreen)
 
 ---
 
-## 🚀 Project Summary
+## Competition Context
 
-This project focuses on **classifying user-generated comments into multiple categories** using a structured machine learning pipeline.
+This project was submitted to the **[Comment Category Prediction Challenge](https://www.kaggle.com/competitions/comment-category-prediction-challenge)** on Kaggle.
 
-The workflow covers:
+The goal was to classify user-generated comments into multiple categories under real-world constraints — significant class imbalance, noisy informal text, and high-dimensional sparse feature spaces.
 
-* 🔍 Data understanding
-* 🧹 Preprocessing
-* 📊 Exploratory analysis
-* 🧠 Feature engineering
-* 🤖 Model training & evaluation
+**Public Leaderboard Score: Macro F1 — 0.8344**
 
 ---
 
-## 🎯 Objective
+## Overview
+
+This project explores multiclass classification of noisy user-generated comments under significant class imbalance.
+
+The objective was not only to achieve strong predictive performance, but also to study how different text representations, feature transformations, and model families behave in sparse high-dimensional NLP settings.
+
+The pipeline includes:
+
+* Exploratory data analysis and linguistic pattern analysis
+* Numerical and text-based feature engineering
+* Sparse text representation using word-level and character-level TF-IDF
+* Transformation and selection of skewed features
+* Systematic comparison of linear and boosting-based models
+* Evaluation focused on class imbalance using Macro F1 and Precision-Recall analysis
+
+---
+
+## Problem Context
+
+The dataset presented several practical NLP challenges:
+
+* Significant class imbalance across target categories
+* Informal and noisy user-generated text
+* High-dimensional sparse feature spaces
+* Minority-class sensitivity under Macro F1 evaluation
+* Overlapping linguistic patterns between semantically similar classes
+
+These constraints made the project particularly useful for studying trade-offs between feature engineering, sparse text representations, and model behavior under imbalance.
+
+---
+
+## Objectives
+
+The primary goals of the project were:
 
 * Accurately classify comments into predefined categories
-* Handle **imbalanced class distribution**
-* Build a model that generalizes well
+* Improve minority-class recall without severely degrading precision
+* Build representations robust to noisy and inconsistent text
+* Compare linear and boosting-based approaches on sparse NLP features
+* Maintain strong generalization under leaderboard evaluation
 
 ---
 
-## 🧠 Approach
+## Exploratory Data Analysis
 
-### 🔹 Data Understanding & Cleaning
+EDA was used not only for descriptive analysis, but to guide downstream feature engineering and modeling decisions.
 
-* Removed irrelevant features
-* Handled missing values
-* Standardized dataset for modeling
+### Key Observations
+
+#### Class Imbalance
+
+The dataset showed substantial imbalance across categories, motivating:
+
+* Macro F1 as the primary evaluation metric
+* Class-weight-aware optimization
+* Precision-Recall analysis instead of ROC-based evaluation
+
+### Linguistic Patterns by Class
+
+Class-wise text analysis revealed that categories often exhibited distinct lexical and structural patterns.
+
+Some categories contained:
+
+* Repeated keywords and recurring semantic themes
+* Short informal comments and noisy phrasing
+* Distinct stylistic and token-frequency patterns
+* Variations in comment length and vocabulary density
+
+These observations motivated the use of:
+
+* Word-level TF-IDF for semantic/contextual signals
+* Character-level TF-IDF (`char_wb`) for robustness against misspellings and morphological variation
+* Additional numerical text statistics such as word count and average word length
+
+### Temporal Patterns
+
+Temporal analysis suggested cyclic activity patterns across comments.
+
+To preserve periodic relationships without introducing artificial ordinal assumptions, temporal features such as hour and month were encoded using sine-cosine transformations.
+
+### Numerical Feature Distributions
+
+Several engineered numerical features showed:
+
+* Strong skewness
+* Heavy zero inflation
+* Long-tailed distributions
+
+This motivated:
+
+* Yeo-Johnson transformation for skew reduction
+* Binary indicator conversion for zero-inflated variables
+* Mutual-information-based comparison of raw vs transformed features
+
+### Feature Importance Alignment with EDA
+
+Mutual Information analysis later confirmed many patterns identified during EDA.
+
+Features associated with:
+
+* Comment length
+* Vocabulary structure
+* Temporal activity patterns
+* Character-level token variation
+
+showed meaningful predictive contribution across several categories.
+
+This alignment between exploratory observations and downstream feature importance provided additional confidence that the engineered features were capturing genuine class-specific behavior rather than noise.
 
 ---
 
-### 🔹 Exploratory Data Analysis  
+## Visualizations
 
-- 📊 **Univariate Analysis**: feature distributions, outliers, and descriptive statistics  
-- 🔗 **Bivariate & Multivariate Analysis**: relationships between features and target variable  
-- ⚖️ **Class Distribution Analysis**: identification of class imbalance  
-- 📝 **Text Analysis**: review of sample comments and linguistic patterns  
-- ☁️ **WordClouds**: top words across entire dataset and across individual classes
-
----
-
-### 📊 Visual: Class Distribution
+### Class Distribution
 
 ![Class Distribution](https://raw.githubusercontent.com/23f2005144/comment-category-classification/main/Class%20Distribution.png)
 
----
+### Model Performance Comparison
 
-### 🔹 Feature Engineering  
-
-- 📝 **Text-based features**: comment length, word count, average word length  
-- ⏱️ **Temporal features**: extracted hour and month  
-  - Applied **sine-cosine transformation** to capture cyclic patterns  
-
-- 🔁 **Zero-inflated features**  
-  - Identified features with excessive zeros  
-  - Converted into **binary indicators** to capture presence/absence  
-
-- 📉 **Handling skewness**  
-  - Evaluated **log transformation** and **Yeo-Johnson transformation**  
-  - **Yeo-Johnson selected** as it reduced skewness more effectively  
-
-- 🔍 **Feature Selection & Comparison**  
-  - Used **Mutual Information (MI)** for feature importance  
-  - Compared **raw vs transformed features separately**  
-  - **Transformed features slightly outperformed** and were retained  
-
-- 🔗 **Final Feature Set**  
-  - Transformed numerical features  
-  - Word-level TF-IDF  
-  - Character-level TF-IDF (`char_wb`)
-
----
-
-### 🔹 Text Representation  
-
-- Built TF-IDF features using both **word-level** and **character-level (`char_wb`) analyzers**  
-
-#### 📌 Word-Level TF-IDF  
-- Tuned **n-gram range**, **min_df**, **max_df**, and **sublinear TF scaling**  
-- Captures semantic and contextual word patterns  
-
-#### 🔬 Character-Level TF-IDF (`char_wb`)  
-- Tuned **n-grams**, **min_df**, and **max_df**  
-- Captures subword patterns and improves robustness to noisy text  
-
-- 🔧 Both vectorizers were **independently tuned and optimized**  
-- 📊 Final feature space consisted of **~125K TF-IDF features**  
-
----
-
-### 🔹 Modeling & Tuning  
-
-Models were trained under a consistent pipeline and **systematically tuned**:
-
-- **Logistic Regression** → tuned using RandomizedSearchCV (regularization, tolerance, class weights)  
-- **Linear SVM (LinearSVC)** → tuned for regularization and class weights  
-- **LightGBM Classifier** → manually tuned across multiple parameter combinations  
-
----
-
-### 📊 Visual: Model Performance Comparison
 ![Model Comparison](https://raw.githubusercontent.com/23f2005144/comment-category-classification/main/Model%20Performance%20Comparison.png)
 
 ---
 
-## 🔎 Evaluation Analysis  
+## Feature Engineering
 
-- Evaluated model performance using **classification report**, **confusion matrix**, and **precision-recall (PR) curves**  
+Feature engineering played a central role in improving model performance.
 
-- 📊 **Classification Report**  
-  - Analyzed **precision, recall, and F1-score per class**  
-  - Helped identify performance gaps, especially in **minority classes**  
+### Engineered Numerical Features
 
-- 🔁 **Confusion Matrix**  
-  - Provided a clear view of **class-wise predictions and misclassifications**  
-  - Useful for understanding where the model was confusing similar categories  
+The following text-derived numerical features were created:
 
-- 📉 **Precision-Recall (PR) Curves**  
-  - Focused on **minority classes**, where performance is harder to capture  
-  - Helped analyze the **precision–recall trade-off** under class imbalance  
+* Comment length
+* Word count
+* Average word length
+* Temporal features extracted from timestamps
 
-- ⚠️ **ROC Curve not used**  
-  - Dropped due to **large number of true negatives**, which can make ROC curves overly optimistic in imbalanced settings  
+These features were intended to capture structural differences in how categories were expressed.
 
-### 🎯 Evaluation Metric  
-**Macro F1 Score**
+### Temporal Encoding
 
-- Accounts for class imbalance  
-- Treats all classes equally  
+Hour and month features were cyclically encoded using sine-cosine transformations.
 
-### 📈 Validation Score  
-**Macro F1: 0.8350**  
+This preserved periodic relationships that would otherwise be distorted under standard ordinal encoding.
 
-### 🏆 Submission Score (Public Leaderboard)  
-**Macro F1: 0.8344**  
+### Handling Zero-Inflated Features
 
-## ⚔️ Challenges & Observations  
+Several engineered variables contained excessive zeros.
 
-### ⚖️ Class Imbalance  
-- Some categories had significantly fewer samples  
-- Addressed using **class weight tuning** to penalize minority classes  
-- Improved recall for minority classes, with a trade-off in precision which was balanced to achieve a good macro f1 score 
+Instead of treating them purely as continuous features, binary indicators were introduced to explicitly model feature presence versus absence.
 
----
+### Handling Skewed Features
 
-### 📝 Noisy Text Data  
-- Informal language, inconsistencies, and variations  
-- Improved robustness using **character-level TF-IDF**  
+Two transformation strategies were evaluated:
 
----
+* Log transformation
+* Yeo-Johnson transformation
 
-### 📉 Skewed Feature Distributions  
-- Numerical features showed strong skewness  
-- Evaluated both **log transformation** and **Yeo-Johnson transformation**  
-- **Yeo-Johnson provided better normalization** and was selected  
+Yeo-Johnson consistently reduced skewness more effectively while remaining stable for zero and negative values, and was therefore retained.
+
+### Feature Selection and Validation
+
+Mutual Information (MI) was used to evaluate feature relevance.
+
+The project compared:
+
+* Raw engineered features
+* Transformed engineered features
+
+The transformed feature set produced slightly stronger validation performance and was selected for the final pipeline.
 
 ---
 
-### 🔍 Feature Selection  
-- Used **Mutual Information (MI)** to evaluate feature importance  
-- Compared **raw vs transformed features**  
-- **Transformed features slightly outperformed** and were retained  
+## Text Representation
+
+The final representation combined:
+
+* Word-level TF-IDF
+* Character-level TF-IDF (`char_wb`)
+* Engineered numerical features
+
+### Word-Level TF-IDF
+
+Word-level vectorization was used to capture:
+
+* Semantic patterns
+* Contextual word relationships
+* Class-specific vocabulary usage
+
+Hyperparameters such as:
+
+* `ngram_range`
+* `min_df`
+* `max_df`
+* `sublinear_tf`
+
+were systematically tuned.
+
+### Character-Level TF-IDF (`char_wb`)
+
+Character-level TF-IDF significantly improved robustness against:
+
+* Informal language
+* Misspellings
+* Morphological variation
+* Noisy user-generated text
+
+This representation was particularly helpful for minority classes with inconsistent phrasing patterns.
+
+### Final Sparse Representation
+
+The final feature space contained approximately 125K sparse TF-IDF features.
+
+This high-dimensional sparse representation favored models capable of efficiently handling sparse inputs, particularly linear methods and gradient boosting approaches.
 
 ---
 
-### ⚙️ Model Trade-offs  
-- Linear models performed strongly on high-dimensional sparse features  
-- Extensive **hyperparameter tuning** was performed across models  
-- Trade-off between **capturing minority class patterns** and **risk of overfitting**  
-- Slight overfitting observed on training/validation was **intentional to improve Macro F1**  
-- Final model generalized well, with **consistent or slightly improved performance on leaderboard data**
+## Modeling Strategy
+
+Three model families were explored to compare how different approaches behave under sparse high-dimensional NLP representations.
+
+### Logistic Regression
+
+Used as a strong linear baseline with:
+
+* Regularization tuning
+* Tolerance optimization
+* Class-weight balancing
+
+### LinearSVC
+
+Evaluated for its strong performance on sparse text representations.
+
+Hyperparameters focused primarily on:
+
+* Regularization strength
+* Class-weight adjustments
+
+### LightGBM
+
+LightGBM was manually tuned across multiple parameter combinations to explore:
+
+* Nonlinear interactions
+* Sparse-feature handling
+* Generalization behavior under imbalance
 
 ---
 
-## 🧩 Key Insights  
+## Model Trade-Off Analysis
 
-- Feature engineering significantly **improved model performance**  
-- Character-level TF-IDF helped capture **minority class patterns** more effectively  
-- LightGBM outperformed linear models by capturing both **linear and non-linear relationships**  
-- Focus was on balancing **precision and recall**, especially for minority classes, under the Macro F1 metric
-  
----
+| Model               | Strengths                                                 | Limitations                          |
+| ------------------- | --------------------------------------------------------- | ------------------------------------ |
+| Logistic Regression | Stable baseline, interpretable behavior                   | Limited nonlinear learning           |
+| LinearSVC           | Strong sparse-feature performance                         | Reduced probability interpretability |
+| LightGBM            | Captured nonlinear interactions and feature relationships | Greater overfitting sensitivity      |
 
-## 🛠️ Tech Stack  
+Linear models performed strongly on sparse TF-IDF representations, while LightGBM achieved the best overall Macro F1 by leveraging both engineered numerical features and nonlinear interactions.
 
-- 🐍 **Core**: Python  
-- 🤖 **Machine Learning**: Scikit-learn, LightGBM  
-- 📊 **Data Handling**: Pandas, NumPy  
-- 📉 **Visualization**: Matplotlib, Seaborn, WordCloud  
-- 🔤 **Text Processing**: Regex (`re`), TF-IDF  
-- 📐 **Statistical Transformations**: SciPy (`scipy.stats`)
+Slight overfitting observed during training-validation comparison was considered acceptable because it improved minority-class recall while maintaining leaderboard generalization.
 
 ---
 
-## 📂 Repository Structure
+## Evaluation Strategy
 
-├── [23f2005144-comment-classification-notebook.ipynb](./23f2005144-comment-classification-notebook.ipynb)   # Complete workflow  
-├── [submission.csv](./submission.csv)                                                                       # Final predictions  
-└── [README.md](./README.md)                                                                                 # Documentation  
+### Primary Metric: Macro F1
+
+Macro F1 was selected because:
+
+* The dataset was highly imbalanced
+* Equal importance was assigned to all classes
+* Minority-class performance needed explicit weighting
+
+### Evaluation Components
+
+The models were evaluated using:
+
+* Classification reports
+* Confusion matrices
+* Precision-Recall curves
+
+### Why ROC Curves Were Avoided
+
+ROC curves were intentionally not prioritized because the large number of true negatives in imbalanced settings can produce overly optimistic interpretations.
+
+Precision-Recall analysis provided more informative insight into minority-class behavior and precision-recall trade-offs.
+
+---
+
+## Results
+
+### Validation Performance
+
+**Macro F1: 0.8350** (up from ~0.79 with a Logistic Regression baseline)
+
+### Public Leaderboard Performance
+
+**Macro F1: 0.8344**
+
+The close alignment between validation and leaderboard scores suggested that the final pipeline generalized reliably without severe leaderboard overfitting.
 
 ---
 
-## 🌟 Summary  
+## Failure Analysis and Observations
 
-A structured end-to-end machine learning pipeline for multiclass text classification, with emphasis on:
+### Minority-Class Challenges
 
-- Data understanding and comprehensive exploratory analysis  
-- Advanced feature engineering, including transformations and feature selection  
-- Robust text representation using word-level and character-level TF-IDF  
-- Systematic model tuning and comparison across linear and boosting models  
-- Careful evaluation using class-wise metrics and precision-recall analysis  
+Minority classes were more sensitive to:
+
+* Noisy phrasing
+* Short comments
+* Overlapping semantic patterns
+
+This occasionally reduced recall under simpler linear baselines.
+
+### Sparse NLP Trade-Offs
+
+The project highlighted the balance between:
+
+* Capturing minority-class patterns
+* Avoiding excessive overfitting
+* Preserving generalization under sparse high-dimensional features
+
+### Feature Representation Insights
+
+Character-level TF-IDF proved especially effective for handling:
+
+* Informal language
+* Misspellings
+* Short noisy comments
+
+while engineered numerical features provided additional structural signals complementary to text representations.
 
 ---
 
-## 💡 Notes for Reviewers  
+## Key Insights
 
-- The notebook contains full experimentation, including feature comparisons and model tuning  
-- Evaluation includes classification reports, confusion matrices, and PR curve analysis  
-- Emphasis is placed on **data-driven decision-making and trade-offs at each stage of the pipeline**
+* Feature engineering substantially improved overall model performance
+* Character-level TF-IDF improved robustness against noisy user-generated text
+* Feature importance analysis aligned closely with earlier EDA observations
+* LightGBM benefited from combining sparse TF-IDF features with engineered numerical features
+* Precision-Recall analysis was significantly more informative than ROC analysis under imbalance
+* Careful trade-off balancing between minority recall and precision was critical for optimizing Macro F1
 
 ---
+
+## Repository Structure
+
+```text
+.
+├── 23f2005144-comment-classification-notebook.ipynb
+├── submission.csv
+├── Class Distribution.png
+├── Model Performance Comparison.png
+└── README.md
+```
+
+---
+
+## Reproducing the Project
+
+The dataset is sourced from the Kaggle competition and cannot be redistributed here.
+
+To run the project:
+
+1. Download `train.csv` and `test.csv` from the [competition data page](https://www.kaggle.com/competitions/comment-category-prediction-challenge)
+2. Place them in the root directory alongside the notebook
+3. Install dependencies and run:
+
+```bash
+pip install -r requirements.txt
+jupyter notebook 23f2005144-comment-classification-notebook.ipynb
+```
+
+---
+
+## Tech Stack
+
+| Category                    | Tools                          |
+| --------------------------- | ------------------------------ |
+| Core Language               | Python                         |
+| Machine Learning            | Scikit-learn, LightGBM         |
+| Data Handling               | Pandas, NumPy                  |
+| Visualization               | Matplotlib, Seaborn, WordCloud |
+| NLP / Text Processing       | TF-IDF, Regex                  |
+| Statistical Transformations | SciPy                          |
+
+---
+
+## Future Improvements
+
+* Engineering additional engagement-based features (e.g. interaction signals, user activity patterns) to improve class separability
+* Deeper error analysis on Class 3 specifically — understanding whether its poor performance stems from overlapping linguistic patterns, insufficient samples, or feature representation gaps
+* More systematic hyperparameter search using automated tuning instead of manual combinations
+* Ensemble combinations of linear and boosting models to balance sparse-feature strengths of LinearSVC with LightGBM's nonlinear capacity
+
+---
+
+## Notes for Reviewers
+
+The notebook contains:
+
+* Full exploratory analysis
+* Feature engineering experiments
+* Transformation comparisons
+* Mutual Information feature analysis
+* Hyperparameter tuning workflows
+* Model comparison and evaluation
+* Precision-Recall and confusion matrix analysis
+
+The project emphasizes data-driven reasoning, trade-off analysis, and iterative experimentation throughout the pipeline.
