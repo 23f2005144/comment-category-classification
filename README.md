@@ -269,7 +269,7 @@ Manually tuned across 5 parameter combinations to explore nonlinear interactions
 
 ## Model Trade-Off Analysis
 
-| Model | Val Macro F1 | Leaderboard F1 | Strengths | Limitations |
+| Model | Validation Macro F1 | Leaderboard Macro F1 | Strengths | Limitations |
 |---|---|---|---|---|
 | Logistic Regression | 0.8273 | 0.8243 | Stable baseline, interpretable | Limited nonlinear learning |
 | LinearSVC | 0.8151 | 0.8181 | Strong sparse-feature performance | Reduced probability interpretability |
