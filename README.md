@@ -16,8 +16,13 @@ High-dimensional NLP classification pipeline for approximately 198K noisy user-g
 This project was developed as part of the **Machine Learning Practice (MLP) Project** course under the **BS in Data Science and Applications** programme at **IIT Madras**, independently executed using the **[Comment Category Prediction Challenge](https://www.kaggle.com/competitions/comment-category-prediction-challenge)** on Kaggle as the problem statement.
 
 The project was evaluated through a two-stage viva:
-- **Level 1** — 20-minute assessment by course instructors covering fundamentals, methodology, and project understanding
-- **Level 2** — 1-hour assessment by industry experts covering depth of approach, trade-off reasoning, and technical decisions
+
+- **Level 1 Viva** — Focused on verifying end-to-end project implementation, including data loading, EDA, preprocessing, feature engineering, pipeline construction, hyperparameter tuning, model comparison, and the ability to clearly explain code structure and implementation decisions.
+- **Level 2 Viva** — 1-hour technical viva with industry experts involving a detailed walkthrough of the complete pipeline. Evaluation focused on:
+  - conceptual understanding
+  - mathematical foundations
+  - practical implementation
+  - programming-level understanding
 
 **Academic Score: 96/100 (S Grade)**  
 **Public Leaderboard Score: Macro F1 — 0.8344** *(cutoff to qualify for viva: 0.80)*
@@ -65,7 +70,7 @@ Evaluation & Interpretation
 
 ## Problem Context
 
-The dataset contained **198,000 comments** across 15 features, including engagement signals (upvotes, downvotes, emoticon counts), interaction flags, demographic metadata (race, religion, gender), and the raw comment text.
+The dataset contained **198,000 comments** across 15 features, including engagement signals (`upvote`, `downvote`, emoticon counts), automated system indicators (`if_1`, `if_2`), demographic metadata (`race`, `religion`, `gender`), and the raw comment text.
 
 Several practical NLP challenges were present:
 
@@ -95,9 +100,7 @@ These constraints made the project particularly useful for studying trade-offs b
 The primary goals of the project were:
 
 * Accurately classify comments into predefined categories
-* Improve minority-class recall without severely degrading precision
 * Build representations robust to noisy and inconsistent text
-* Compare linear and boosting-based approaches on sparse NLP features
 * Maintain strong generalisation under leaderboard evaluation
 
 ---
@@ -110,25 +113,28 @@ EDA was used not only for descriptive analysis, but to guide downstream feature 
 
 **Missing Value Strategy**
 
-The race, religion, and gender columns each contained approximately **73% missing values**. Three approaches were considered:
+The `race`, `religion`, and `gender` columns each contained approximately **73% missing values**. Three approaches were considered:
 
 * Dropping rows — not viable at 73% missingness without severe data loss
 * Imputing from existing categories — would introduce distributional bias since the true distribution of missing entries was unknown
 * Creating a separate **"Missing"** category — selected, as it preserves the absence of demographic information as a signal in itself
 
-The single missing value in the comment column was dropped safely.
+The single missing value in the `comment` column was dropped safely.
 
-The post_id column was investigated separately — comments within the same thread still had different labels, meaning thread identity carried no predictive signal and the column was dropped.
+The `post_id` column was investigated separately — comments within the same thread still had different labels, meaning thread identity carried no predictive signal and the column was dropped.
 
 ### Class Imbalance
 
-The dataset showed substantial imbalance across categories, motivating:
+The dataset exhibited approximately a **21:1 imbalance ratio** between the majority and minority classes, creating significant challenges for minority-class recall and stable Macro F1 optimisation.
+
+This imbalance motivated:
 
 * Macro F1 as the primary evaluation metric
 * Class-weight-aware optimisation
 * Precision-Recall analysis instead of ROC-based evaluation
 
-Standard remedies such as oversampling and undersampling were considered but rejected: undersampling would cause significant information loss at 198K rows, while oversampling risked introducing duplicate samples and inflating training data artificially. Class weight penalisation was used instead.
+Standard remedies such as oversampling and undersampling were considered but rejected: undersampling would cause significant information loss at 198K rows, while oversampling risked introducing duplicate samples and artificially inflating the training distribution. Class-weight penalisation was used instead.
+
 
 ### Linguistic Patterns by Class
 
@@ -153,9 +159,9 @@ Temporal analysis suggested cyclic activity patterns across comments. To preserv
 
 Several numerical features showed strong skewness, heavy zero inflation, and long-tailed distributions.
 
-Among numerical features, **if_2** showed the most noticeable median differences across classes, suggesting stronger predictive signal compared to features like upvote, downvote, and emoticon counts, which showed heavy IQR overlap across all classes.
+Among numerical features, `if_2` showed the most noticeable median differences across classes, suggesting stronger predictive signal compared to features like `upvote`, `downvote`, and emoticon counts, which showed heavy IQR overlap across all classes.
 
-Categorical features (race, religion, gender) showed a disproportionately strong association with **Class 1** despite it being a minority class — an early signal that demographic context was a meaningful predictor for that specific category.
+Categorical features (`race`, `religion`, `gender`) showed a disproportionately strong association with **Class 1** despite it being a minority class — an early signal that demographic context was a meaningful predictor for that specific category.
 
 These observations motivated:
 
@@ -177,6 +183,10 @@ This alignment between exploratory observations and downstream feature importanc
 
 ![Class Distribution](https://raw.githubusercontent.com/23f2005144/comment-category-classification/main/Class%20Distribution.png)
 
+### Class-Wise Word Clouds
+
+![Class Wise Wordclouds](https://raw.githubusercontent.com/23f2005144/comment-category-classification/main/Class%20Wise%20Wordclouds.png)
+
 ### Model Performance Comparison
 
 ![Model Comparison](https://raw.githubusercontent.com/23f2005144/comment-category-classification/main/Model%20Performance%20Comparison.png)
@@ -195,7 +205,7 @@ The following features were created from the raw data:
 * **Word count** — number of words in the comment
 * **Average word length** — derived from comment length ÷ word count, capturing whether comments use simpler or more complex vocabulary
 * **Hour, month, year** — extracted from the comment timestamp
-* **Disability** — boolean column converted to numeric binary (0/1) for pipeline compatibility
+* **`disability`** — boolean column converted to numeric binary (0/1) for pipeline compatibility
 
 Comment length and word count showed strong positive correlation (both derived from the same source), which was noted but accepted as both carried complementary structural signals.
 
@@ -205,11 +215,11 @@ Hour and month features were cyclically encoded using sine-cosine transformation
 
 ### Handling Zero-Inflated Features
 
-Features such as emoticon counts, if_1, and downvote were heavily zero-inflated. Instead of treating them purely as continuous features, binary indicators were introduced to explicitly model feature presence versus absence, reducing skewness and allowing models to learn meaningful patterns.
+Features such as emoticon counts, `if_1`, and `downvote` were heavily zero-inflated. Instead of treating them purely as continuous features, binary indicators were introduced to explicitly model feature presence versus absence, reducing skewness and allowing models to learn meaningful patterns.
 
 ### Handling Skewed Features
 
-Two transformation strategies were evaluated on features such as upvote, if_2, average word length, and word count:
+Two transformation strategies were evaluated on features such as `upvote`, `if_2`, average word length, and word count:
 
 * Log transformation
 * Yeo-Johnson transformation
@@ -263,7 +273,7 @@ Evaluated for its strong performance on sparse text representations, with hyperp
 
 ### LightGBM
 
-Manually tuned across 5 parameter combinations to explore nonlinear interactions, sparse-feature handling, and generalisation behaviour under imbalance.
+Manually tuned across parameter combinations to explore nonlinear interactions, sparse-feature handling, and generalisation behaviour under imbalance.
 
 ---
 
@@ -304,7 +314,7 @@ ROC curves were intentionally not prioritised because the large number of true n
 | Raw TF-IDF baseline (Logistic Regression) | 0.7968 |
 | + Feature engineering | 0.8137 |
 | + Hyperparameter tuning | 0.8273 |
-| + char_wb TF-IDF + LightGBM (final) | **0.8353** |
+| + `char_wb` TF-IDF + LightGBM (final) | **0.8353** |
 
 ### Public Leaderboard Performance
 
@@ -334,14 +344,14 @@ The project highlighted the balance between capturing minority-class patterns, a
 
 ### Feature Representation Insights
 
-Character-level TF-IDF proved especially effective for handling informal language, misspellings, and short noisy comments, while engineered numerical features provided complementary structural signals.
+Character-level TF-IDF (`char_wb`) proved especially effective for handling informal language, misspellings, and short noisy comments, while engineered numerical features provided complementary structural signals.
 
 ---
 
 ## Key Insights
 
 * Feature engineering substantially improved overall model performance
-* Character-level TF-IDF improved robustness against noisy user-generated text
+* Character-level TF-IDF (`char_wb`) improved robustness against noisy user-generated text
 * Feature importance analysis aligned closely with earlier EDA observations
 * LightGBM benefited from combining sparse TF-IDF features with engineered numerical features
 * Precision-Recall analysis was significantly more informative than ROC analysis under imbalance
@@ -351,7 +361,7 @@ Character-level TF-IDF proved especially effective for handling informal languag
 
 ## Lessons Learned
 
-* Character-level TF-IDF was especially effective for improving robustness on noisy minority-class samples
+* Character-level TF-IDF (`char_wb`) was especially effective for improving robustness on noisy minority-class samples
 * Sparse linear models remained highly competitive despite the availability of more complex nonlinear approaches
 * Evaluation metric selection significantly influenced optimisation strategy under heavy class imbalance
 * Incremental improvements in feature engineering produced larger gains than aggressively increasing model complexity
@@ -364,10 +374,12 @@ Character-level TF-IDF proved especially effective for handling informal languag
 ```text
 .
 ├── 23f2005144-comment-classification-notebook.ipynb
-├── submission.csv
 ├── Class Distribution.png
+├── Class Wise Wordclouds.png
 ├── Model Performance Comparison.png
-└── README.md
+├── README.md
+├── requirements.txt
+└── submission.csv
 ```
 
 ---
@@ -406,7 +418,6 @@ jupyter notebook 23f2005144-comment-classification-notebook.ipynb
 
 * Engineering additional engagement-based features (e.g. interaction signals, user activity patterns) to improve class separability
 * Deeper error analysis on Class 3 specifically — understanding whether its poor performance stems from overlapping linguistic patterns, insufficient samples, or feature representation gaps
-* More systematic hyperparameter search using automated tuning instead of manual combinations
 * Ensemble combinations of linear and boosting models to balance sparse-feature strengths of LinearSVC with LightGBM's nonlinear capacity
 
 ---
@@ -419,7 +430,7 @@ The notebook is structured sequentially and mirrors this README:
 |---|---|
 | EDA | Data overview, missing value handling, class distribution, text analysis, uni/bi/multivariate analysis |
 | Feature Engineering | Binary indicators, sine-cosine encoding, skew transformations, MI comparison |
-| Text Representation | TF-IDF word + char_wb tuning, feature space construction |
+| Text Representation | TF-IDF word + `char_wb` tuning, feature space construction |
 | Modeling | Baseline → tuned runs for all 3 models, with classification reports, confusion matrices, PR curves, and feature importance plots |
 | Submission | Final model retrained on full data, all 3 submission scores documented |
 
