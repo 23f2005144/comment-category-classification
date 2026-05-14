@@ -1,6 +1,6 @@
 # Multiclass Comment Classification Pipeline
 
-High-dimensional NLP classification pipeline for **198,000 noisy user-generated comments** using TF-IDF representations, feature engineering, and class-imbalance-aware modeling.
+High-dimensional NLP classification pipeline for approximately 198K noisy user-generated comments using TF-IDF representations, feature engineering, and class-imbalance-aware modeling.
 
 ![Project](https://img.shields.io/badge/Project-NLP%20Pipeline-blue)
 ![Task](https://img.shields.io/badge/Task-Multiclass%20Classification-orange)
