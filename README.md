@@ -1,6 +1,6 @@
 # Multiclass Comment Classification Pipeline
 
-High-dimensional NLP classification pipeline for approximately 198K noisy user-generated comments using TF-IDF representations, feature engineering, and class-imbalance-aware modeling.
+High-dimensional NLP classification pipeline for approximately 198K noisy user-generated comments under a severe 21:1 class imbalance ratio, using TF-IDF representations, feature engineering, and class-imbalance-aware modelling.
 
 ![Project](https://img.shields.io/badge/Project-NLP%20Pipeline-blue)
 ![Task](https://img.shields.io/badge/Task-Multiclass%20Classification-orange)
@@ -15,17 +15,10 @@ High-dimensional NLP classification pipeline for approximately 198K noisy user-g
 
 This project was developed as part of the **Machine Learning Practice (MLP) Project** course under the **BS in Data Science and Applications** programme at **IIT Madras**, independently executed using the **[Comment Category Prediction Challenge](https://www.kaggle.com/competitions/comment-category-prediction-challenge)** on Kaggle as the problem statement.
 
-The project was evaluated through a two-stage viva:
+- **Public Leaderboard Score: Macro F1 — 0.8344** *(Top 5% on Kaggle Public Leaderboard)*
+- **Academic Score: 96/100 (S Grade)** 
 
-- **Level 1 Viva** — Focused on verifying end-to-end project implementation, including data loading, EDA, preprocessing, feature engineering, pipeline construction, hyperparameter tuning, model comparison, and the ability to clearly explain code structure and implementation decisions.
-- **Level 2 Viva** — 1-hour technical viva with industry experts involving a detailed walkthrough of the complete pipeline. Evaluation focused on:
-  - conceptual understanding
-  - mathematical foundations
-  - practical implementation
-  - programming-level understanding
-
-**Academic Score: 96/100 (S Grade)**  
-**Public Leaderboard Score: Macro F1 — 0.8344** *(cutoff to qualify for viva: 0.80)*
+The project focused not only on leaderboard performance, but also on understanding representation trade-offs, class-imbalance behaviour, and model generalisation in sparse NLP settings.
 
 Having completed foundational coursework in ML algorithms, this project was an opportunity to apply that theory end-to-end — building a full pipeline with Scikit-learn, LightGBM, Pandas, NumPy, Matplotlib, and Seaborn on a real problem with real constraints.
 
@@ -33,7 +26,7 @@ Having completed foundational coursework in ML algorithms, this project was an o
 
 ## Overview
 
-This project explores multiclass classification of noisy user-generated comments under significant class imbalance.
+This project explores multiclass classification of noisy user-generated comments under severe class imbalance in a sparse high-dimensional NLP setting.
 
 The objective was not only to achieve strong predictive performance, but also to study how different text representations, feature transformations, and model families behave in sparse high-dimensional NLP settings.
 
@@ -74,7 +67,7 @@ The dataset contained **198,000 comments** across 15 features, including engagem
 
 Several practical NLP challenges were present:
 
-* Significant class imbalance across target categories
+* Significant class imbalance across target categories (~21:1 class imbalance ratio)
 * Informal and noisy user-generated text
 * High-dimensional sparse feature spaces
 * Minority-class sensitivity under Macro F1 evaluation
@@ -125,7 +118,7 @@ The `post_id` column was investigated separately — comments within the same th
 
 ### Class Imbalance
 
-The dataset exhibited approximately a **21:1 imbalance ratio** between the majority and minority classes, creating significant challenges for minority-class recall and stable Macro F1 optimisation.
+The dataset exhibited a **21:1 imbalance ratio** between the majority and minority classes, creating significant challenges for minority-class recall and stable Macro F1 optimisation.
 
 This imbalance motivated:
 
@@ -142,7 +135,7 @@ Class-wise text analysis revealed distinct lexical and structural patterns acros
 
 * **Class 0** reflected relatively neutral language with factual discussion patterns
 * **Class 1** contained hateful and discriminatory language with strong demographic keyword associations
-* **Class 2** showed significant vocabulary overlap with other classes, making it the hardest class to separate
+* **Class 2** showed significant vocabulary overlap with other classes, making it the most overlap-prone class
 * **Class 3** contained violent and offensive expressions with more distinct but rare vocabulary patterns
 
 The overlap between Class 2 and other classes was consistently the most common source of misclassification across all models. These observations motivated the use of:
@@ -259,7 +252,7 @@ Truncated SVD was intentionally not applied. SVD captures global variance across
 
 ---
 
-## Modeling Strategy
+## Modelling Strategy
 
 Three model families were explored to compare behaviour under sparse high-dimensional NLP representations.
 
@@ -318,7 +311,7 @@ ROC curves were intentionally not prioritised because the large number of true n
 
 ### Public Leaderboard Performance
 
-**Macro F1: 0.8344**
+**Macro F1: 0.8344** *(Top 5% on public leaderboard)*
 
 The close alignment between validation (0.8353) and leaderboard (0.8344) scores confirmed the pipeline generalised reliably. The progression table above shows that feature engineering contributed more to the final score than switching model families.
 
@@ -431,7 +424,7 @@ The notebook is structured sequentially and mirrors this README:
 | EDA | Data overview, missing value handling, class distribution, text analysis, uni/bi/multivariate analysis |
 | Feature Engineering | Binary indicators, sine-cosine encoding, skew transformations, MI comparison |
 | Text Representation | TF-IDF word + `char_wb` tuning, feature space construction |
-| Modeling | Baseline → tuned runs for all 3 models, with classification reports, confusion matrices, PR curves, and feature importance plots |
+| Modelling | Baseline → tuned runs for all 3 models, with classification reports, confusion matrices, PR curves, and feature importance plots |
 | Submission | Final model retrained on full data, all 3 submission scores documented |
 
 The emphasis throughout is on data-driven decision-making — each engineering and modelling choice is motivated by a preceding observation.
