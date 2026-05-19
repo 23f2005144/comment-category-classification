@@ -7,7 +7,8 @@ High-dimensional NLP classification pipeline for approximately 198K noisy user-g
 ![Approach](https://img.shields.io/badge/Approach-TFIDF%20%2B%20Feature%20Engineering-purple)
 ![Model](https://img.shields.io/badge/Best%20Model-LightGBM-green)
 ![Metric](https://img.shields.io/badge/Macro%20F1-0.8344-teal)
-![Status](https://img.shields.io/badge/Status-Completed-brightgreen)
+![Kaggle](https://img.shields.io/badge/Kaggle-Top%205%25-20BEFF?logo=kaggle&logoColor=white)
+![Academic](https://img.shields.io/badge/Academic%20Score-96%2F100%20(S%20Grade)-brightgreen)
 
 ---
 
@@ -16,7 +17,7 @@ High-dimensional NLP classification pipeline for approximately 198K noisy user-g
 This project was developed as part of the **Machine Learning Practice (MLP) Project** course under the **BS in Data Science and Applications** programme at **IIT Madras**, independently executed using the **[Comment Category Prediction Challenge](https://www.kaggle.com/competitions/comment-category-prediction-challenge)** on Kaggle as the problem statement.
 
 - **Public Leaderboard Score: Macro F1 — 0.8344** *(Top 5% on Kaggle Public Leaderboard)*
-- **Academic Score: 96/100 (S Grade)** 
+- **Academic Score: 96/100 (S Grade)**
 
 The project focused not only on leaderboard performance, but also on understanding representation trade-offs, class-imbalance behaviour, and model generalisation in sparse NLP settings.
 
@@ -79,10 +80,10 @@ The target had four classes with no provided descriptions. Text analysis during 
 |---|---|
 | 0 | Relatively neutral language and factual discussion |
 | 1 | Hateful and discriminatory language; minority class with strong demographic signal |
-| 2 | Ambiguous vocabulary with significant overlap across other classes; majority class |
+| 2 | Ambiguous vocabulary with overlap across other classes; majority class |
 | 3 | Violent and offensive expressions; smallest class with more distinct but rare patterns |
 
-These characterisations were derived from sampling and linguistic pattern analysis during EDA, not provided as part of the competition. Class 2's broad vocabulary overlap was identified early as the likely primary driver of misclassification — a pattern confirmed across all models.
+These characterisations were derived from sampling and linguistic pattern analysis during EDA, not provided as part of the competition.
 
 These constraints made the project particularly useful for studying trade-offs between feature engineering, sparse text representations, and model behaviour under imbalance.
 
@@ -128,7 +129,6 @@ This imbalance motivated:
 
 Standard remedies such as oversampling and undersampling were considered but rejected: undersampling would cause significant information loss at 198K rows, while oversampling risked introducing duplicate samples and artificially inflating the training distribution. Class-weight penalisation was used instead.
 
-
 ### Linguistic Patterns by Class
 
 Class-wise text analysis revealed distinct lexical and structural patterns across categories:
@@ -137,12 +137,6 @@ Class-wise text analysis revealed distinct lexical and structural patterns acros
 * **Class 1** contained hateful and discriminatory language with strong demographic keyword associations
 * **Class 2** showed significant vocabulary overlap with other classes, making it the most overlap-prone class
 * **Class 3** contained violent and offensive expressions with more distinct but rare vocabulary patterns
-
-The overlap between Class 2 and other classes was consistently the most common source of misclassification across all models. These observations motivated the use of:
-
-* Word-level TF-IDF for semantic and contextual signals
-* Character-level TF-IDF (`char_wb`) for robustness against misspellings and morphological variation — particularly helpful for Class 3's sparse and inconsistent phrasing
-* Additional numerical text statistics such as word count and average word length
 
 ### Temporal Patterns
 
@@ -183,6 +177,12 @@ This alignment between exploratory observations and downstream feature importanc
 ### Model Performance Comparison
 
 ![Model Comparison](https://raw.githubusercontent.com/23f2005144/comment-category-classification/main/Model%20Performance%20Comparison.png)
+
+### Precision-Recall Curves — Minority Classes (Class 1 & Class 3)
+
+Precision-Recall curves are shown for Class 1 and Class 3 for the LightGBM model. These classes were selected because they represent the two hardest minority-class problems in this pipeline — Class 1 due to its strong but narrow demographic signal, and Class 3 due to its small sample size and inconsistent phrasing patterns. ROC curves were intentionally not used; see [Evaluation Strategy](#evaluation-strategy) for reasoning.
+
+![PR Curves Minority Classes](https://raw.githubusercontent.com/23f2005144/comment-category-classification/main/PR%20Curves%20Minority%20Classes.png)
 
 ---
 
@@ -258,15 +258,25 @@ Three model families were explored to compare behaviour under sparse high-dimens
 
 ### Logistic Regression
 
-Used as a strong linear baseline with regularisation tuning, tolerance optimisation, and class-weight balancing.
+Used as a strong linear baseline with regularisation tuning (`C`: [0.01, 0.1, 1, 10]), tolerance optimisation, and class-weight balancing.
 
 ### LinearSVC
 
-Evaluated for its strong performance on sparse text representations, with hyperparameter focus on regularisation strength and class-weight adjustments.
+Evaluated for its strong performance on sparse text representations, with hyperparameter focus on regularisation strength (`C`: [0.01, 0.1, 1]) and class-weight adjustments.
 
 ### LightGBM
 
-Manually tuned across parameter combinations to explore nonlinear interactions, sparse-feature handling, and generalisation behaviour under imbalance.
+Manually tuned across 5 parameter combinations, exploring:
+
+| Parameter | Values Explored |
+|---|---|
+| `num_leaves` | 50, 100, 150 |
+| `learning_rate` | 0.05, 0.1 |
+| `n_estimators` | 300, 500 |
+| `min_child_samples` | 20, 50 |
+| `class_weight` | balanced vs manual weights |
+
+The full per-run scores for all 5 combinations are documented in the notebook. Manual tuning was chosen over grid search given the high dimensionality and sparse input — exhaustive search was computationally infeasible at this feature scale.
 
 ---
 
@@ -278,7 +288,7 @@ Manually tuned across parameter combinations to explore nonlinear interactions, 
 | LinearSVC | 0.8151 | 0.8181 | Strong sparse-feature performance | Reduced probability interpretability |
 | LightGBM | **0.8353** | **0.8344** | Captured nonlinear interactions | Greater overfitting sensitivity |
 
-LightGBM achieved the best overall Macro F1 (+0.008 over Logistic Regression on validation) by leveraging both engineered numerical features and nonlinear interactions. The manual tuning table across 5 parameter combinations is documented in the notebook.
+LightGBM achieved the best overall Macro F1 (+0.008 over Logistic Regression on validation) by leveraging both engineered numerical features and nonlinear interactions.
 
 Slight overfitting in the final LightGBM model (train F1: 0.9777 vs val F1: 0.8353) was considered acceptable — it improved minority-class recall while the leaderboard score confirmed generalisation was maintained.
 
@@ -329,7 +339,7 @@ Class 3 (violent/offensive) showed the lowest Average Precision across all three
 | LinearSVC | 0.80 | 0.65 |
 | LightGBM | 0.85 | 0.73 |
 
-This gap likely stems from Class 3's combination of small sample size, vocabulary overlap with Class 1, and rare/inconsistent phrasing patterns. Class 2 was the most frequently misclassified overall due to vocabulary overlap across all categories.
+The consistency of this gap across all three model families — linear and nonlinear — suggests this is primarily a data and representation problem rather than a modelling limitation.
 
 ### Sparse NLP Trade-Offs
 
@@ -341,24 +351,14 @@ Character-level TF-IDF (`char_wb`) proved especially effective for handling info
 
 ---
 
-## Key Insights
+## Key Takeaways
 
-* Feature engineering substantially improved overall model performance
-* Character-level TF-IDF (`char_wb`) improved robustness against noisy user-generated text
-* Feature importance analysis aligned closely with earlier EDA observations
-* LightGBM benefited from combining sparse TF-IDF features with engineered numerical features
-* Precision-Recall analysis was significantly more informative than ROC analysis under imbalance
-* Careful trade-off balancing between minority recall and precision was critical for optimising Macro F1
-
----
-
-## Lessons Learned
-
-* Character-level TF-IDF (`char_wb`) was especially effective for improving robustness on noisy minority-class samples
-* Sparse linear models remained highly competitive despite the availability of more complex nonlinear approaches
-* Evaluation metric selection significantly influenced optimisation strategy under heavy class imbalance
-* Incremental improvements in feature engineering produced larger gains than aggressively increasing model complexity
-* Alignment between EDA observations and downstream feature importance improved confidence in feature design decisions
+* Feature engineering contributed more to overall performance than model selection — the pipeline gained +0.017 Macro F1 from engineering alone vs +0.008 from switching to LightGBM
+* Character-level TF-IDF (`char_wb`) improved robustness against noisy, inconsistent minority-class text in ways word-level TF-IDF could not
+* Sparse linear models (Logistic Regression, LinearSVC) remained highly competitive despite the availability of more complex nonlinear approaches
+* Evaluation metric selection significantly shaped the optimisation strategy — Macro F1 forced minority-class sensitivity that accuracy would have ignored
+* Mutual Information analysis confirmed EDA patterns, improving confidence that engineered features captured genuine class signals rather than noise
+* Incremental feature improvements produced larger gains than aggressively increasing model complexity — a consistent finding across all pipeline stages
 
 ---
 
@@ -370,6 +370,7 @@ Character-level TF-IDF (`char_wb`) proved especially effective for handling info
 ├── Class Distribution.png
 ├── Class Wise Wordclouds.png
 ├── Model Performance Comparison.png
+├── PR Curves Minority Classes.png
 ├── README.md
 ├── requirements.txt
 └── submission.csv
