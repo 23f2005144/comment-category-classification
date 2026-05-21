@@ -7,7 +7,7 @@ High-dimensional NLP classification pipeline for approximately 198K noisy user-g
 ![Approach](https://img.shields.io/badge/Approach-TFIDF%20%2B%20Feature%20Engineering-purple)
 ![Model](https://img.shields.io/badge/Best%20Model-LightGBM-green)
 ![Metric](https://img.shields.io/badge/Macro%20F1-0.8344-teal)
-![Kaggle](https://img.shields.io/badge/Kaggle-Top%205%25-20BEFF?logo=kaggle&logoColor=white)
+![Kaggle](https://img.shields.io/badge/Kaggle%20Competition-Top%205%25%20Finish-20BEFF?logo=kaggle&logoColor=white)
 ![Academic](https://img.shields.io/badge/Academic%20Score-96%2F100%20(S%20Grade)-brightgreen)
 
 ---
