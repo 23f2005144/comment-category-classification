@@ -51,7 +51,7 @@ EDA & Text Analysis
            ↓
 Feature Engineering
            ↓
-TF-IDF + Engineered Features
+TFIDF + Engineered Features
            ↓
 High-Dimensional Sparse Matrix
            ↓
@@ -115,7 +115,7 @@ The `race`, `religion`, and `gender` columns each contained approximately **73% 
 
 The single missing value in the `comment` column was dropped safely.
 
-The `post_id` column was investigated separately — comments within the same thread still had different labels, meaning thread identity carried no predictive signal and the column was dropped.
+The `post_id` column was investigated separately where comments within the same thread still had different labels, meaning thread identity carried no predictive signal and the column was dropped.
 
 ### Class Imbalance
 
@@ -148,7 +148,7 @@ Several numerical features showed strong skewness, heavy zero inflation, and lon
 
 Among numerical features, `if_2` showed the most noticeable median differences across classes, suggesting stronger predictive signal compared to features like `upvote`, `downvote`, and emoticon counts, which showed heavy IQR overlap across all classes.
 
-Categorical features (`race`, `religion`, `gender`) showed a disproportionately strong association with **Class 1** despite it being a minority class — an early signal that demographic context was a meaningful predictor for that specific category.
+Categorical features (`race`, `religion`, `gender`) showed a disproportionately strong association with **Class 1** despite it being a minority class which was an early signal that demographic context was a meaningful predictor for that specific category.
 
 These observations motivated:
 
@@ -180,7 +180,7 @@ This alignment between exploratory observations and downstream feature importanc
 
 ### Precision-Recall Curves — Minority Classes (Class 1 & Class 3)
 
-Precision-Recall curves are shown for Class 1 and Class 3 for the LightGBM model. These classes were selected because they represent the two hardest minority-class problems in this pipeline — Class 1 due to its strong but narrow demographic signal, and Class 3 due to its small sample size and inconsistent phrasing patterns. ROC curves were intentionally not used; see [Evaluation Strategy](#evaluation-strategy) for reasoning.
+Precision-Recall curves are shown for Class 1 and Class 3 for the LightGBM model. These classes were selected because they represent the two hardest minority-class problems in this pipeline as Class 1 due to its strong but narrow demographic signal, and Class 3 due to its small sample size and inconsistent phrasing patterns. ROC curves were intentionally not used; see [Evaluation Strategy](#evaluation-strategy) for reasoning.
 
 ![PR Curves Minority Classes](https://raw.githubusercontent.com/23f2005144/comment-category-classification/main/PR%20Curves%20Minority%20Classes.png)
 
@@ -290,7 +290,7 @@ The full per-run scores for all 5 combinations are documented in the notebook. M
 
 LightGBM achieved the best overall Macro F1 (+0.008 over Logistic Regression on validation) by leveraging both engineered numerical features and nonlinear interactions.
 
-Slight overfitting in the final LightGBM model (train F1: 0.9777 vs val F1: 0.8353) was considered acceptable — it improved minority-class recall while the leaderboard score confirmed generalisation was maintained.
+Slight overfitting in the final LightGBM model (train F1: 0.9777 vs val F1: 0.8353) was considered acceptable as it improved minority-class recall while the leaderboard score confirmed generalisation was maintained.
 
 ---
 
@@ -339,12 +339,13 @@ Class 3 (violent/offensive) showed the lowest Average Precision across all three
 | LinearSVC | 0.80 | 0.65 |
 | LightGBM | 0.85 | 0.73 |
 
-The consistency of this gap across all three model families — linear and nonlinear — suggests this is primarily a data and representation problem rather than a modelling limitation.
+The consistency of this gap across all three model families linear and nonlinear suggests this is primarily a data and representation problem rather than a modelling limitation.
 
-### Sparse NLP Trade-Offs
+### Class 2 — A Gap in the Failure Analysis
 
-The project highlighted the balance between capturing minority-class patterns, avoiding excessive overfitting, and preserving generalisation under sparse high-dimensional features.
+Class 2 was the most frequently misclassified class in terms of absolute confusion volume — primarily bleeding into Class 0 and occasionally into itself across models. Despite this, its Macro F1 contribution was not alarming enough at the time to trigger dedicated PR curve analysis, so Class 2 AP was not computed explicitly.
 
+In retrospect, this was an oversight. High misclassification volume in the majority class can mask a precision problem that F1 alone doesn't surface clearly — the model may be over-predicting Class 2 into adjacent classes precisely because of its broad vocabulary overlap, rather than because it is well-separated. A targeted confusion matrix breakdown and PR curve for Class 2 would have clarified whether this was a threshold calibration issue or a representation gap. This remains the most important unfinished piece of the failure analysis.
 ### Feature Representation Insights
 
 Character-level TF-IDF (`char_wb`) proved especially effective for handling informal language, misspellings, and short noisy comments, while engineered numerical features provided complementary structural signals.
@@ -366,14 +367,14 @@ Character-level TF-IDF (`char_wb`) proved especially effective for handling info
 
 ```text
 .
-├── 23f2005144-comment-classification-notebook.ipynb
-├── Class Distribution.png
-├── Class Wise Wordclouds.png
-├── Model Performance Comparison.png
-├── PR Curves Minority Classes.png
-├── README.md
-├── requirements.txt
-└── submission.csv
+├── 23f2005144-comment-classification-notebook.ipynb  # Full pipeline: EDA → feature engineering → modelling → submission
+├── Class Distribution.png                            # Bar chart of class frequencies; 21:1 imbalance ratio
+├── Class Wise Wordclouds.png                         # Per-class word clouds from EDA text analysis
+├── Model Performance Comparison.png                  # Validation Macro F1 across all 3 models
+├── PR Curves Minority Classes.png                    # Precision-Recall curves for Class 1 and Class 3 (LightGBM)
+├── README.md                                         # This file
+├── requirements.txt                                  # Pinned dependencies
+└── submission.csv                                    # Final LightGBM predictions (run 4, val Macro F1: 0.8353)
 ```
 
 ---
@@ -411,9 +412,8 @@ jupyter notebook 23f2005144-comment-classification-notebook.ipynb
 ## Future Improvements
 
 * Engineering additional engagement-based features (e.g. interaction signals, user activity patterns) to improve class separability
-* Deeper error analysis on Class 3 specifically — understanding whether its poor performance stems from overlapping linguistic patterns, insufficient samples, or feature representation gaps
-* Ensemble combinations of linear and boosting models to balance sparse-feature strengths of LinearSVC with LightGBM's nonlinear capacity
-
+* Targeted error analysis on Class 2 and Class 3, where Class 2's confusion with Class 0 was the largest source of cross-class errors but was not explored with PR curves or threshold analysis; Class 3's low AP was consistent across all models suggesting a data problem rather than a modelling one. Both warrant a dedicated held-out error audit.
+* Ensemble combinations of linear and boosting models, specifically a soft-voting ensemble of LinearSVC probability estimates and LightGBM leaf scores, weighted to favour LinearSVC's sparse-feature precision for minority classes. The goal would be to improve Class 3 recall without degrading Class 0 precision, since the two model families make different errors on the same samples.
 ---
 
 ## Notes for Reviewers
@@ -428,4 +428,4 @@ The notebook is structured sequentially and mirrors this README:
 | Modelling | Baseline → tuned runs for all 3 models, with classification reports, confusion matrices, PR curves, and feature importance plots |
 | Submission | Final model retrained on full data, all 3 submission scores documented |
 
-The emphasis throughout is on data-driven decision-making — each engineering and modelling choice is motivated by a preceding observation.
+The emphasis throughout is on data-driven decision-making where each engineering and modelling choice is motivated by a preceding observation.
