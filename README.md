@@ -70,7 +70,7 @@ Several practical NLP challenges were present:
 
 * Significant class imbalance across target categories (~21:1 class imbalance ratio)
 * Informal and noisy user-generated text
-* Sparse meta=data feature spaces
+* Zero-inflated and heavily skewed numerical metadata features
 * Minority-class sensitivity under Macro F1 evaluation
 * Overlapping linguistic patterns between semantically similar classes
 
@@ -303,6 +303,7 @@ Macro F1 was selected because the dataset was highly imbalanced, equal importanc
 ### Evaluation Components
 
 Models were evaluated using classification reports, confusion matrices, and Precision-Recall curves.
+Class-wise feature importance plots were examined after each tuned model run to verify that learned coefficients aligned with EDA-derived class characterisations.
 
 ### Why ROC Curves Were Avoided
 
@@ -339,16 +340,15 @@ Class 3 (violent/offensive) showed the lowest Average Precision across all three
 | LinearSVC | 0.80 | 0.65 |
 | LightGBM | 0.85 | 0.73 |
 
-The consistency of this gap across all three model families linear and nonlinear suggests this is primarily a data and representation problem rather than a modelling limitation.
+The consistency of this gap across all three model families suggests a data and representation problem rather than a modelling limitation.
 
-### Class 2 — A Gap in the Failure Analysis
+### Class 2 — Vocabulary Overlap as a Representation Gap
 
-Class 2 was the most frequently misclassified class in terms of absolute confusion volume — primarily bleeding into Class 0 and occasionally into itself across models. Despite this, its Macro F1 contribution was not alarming enough at the time to trigger dedicated PR curve analysis, so Class 2 AP was not computed explicitly.
+Class 2 had the highest absolute misclassification volume, bleeding primarily into Class 0. This was already visible in the class-wise feature importance plots — Class 2 shared its top-weighted tokens almost entirely with Class 0, meaning the two classes were not well-separated at the vocabulary level. A dedicated PR curve and confusion matrix breakdown for Class 2 remains the most important unfinished piece of this analysis.
 
-In retrospect, this was an oversight. High misclassification volume in the majority class can mask a precision problem that F1 alone doesn't surface clearly — the model may be over-predicting Class 2 into adjacent classes precisely because of its broad vocabulary overlap, rather than because it is well-separated. A targeted confusion matrix breakdown and PR curve for Class 2 would have clarified whether this was a threshold calibration issue or a representation gap. This remains the most important unfinished piece of the failure analysis.
 ### Feature Representation Insights
 
-Character-level TF-IDF (`char_wb`) proved especially effective for handling informal language, misspellings, and short noisy comments, while engineered numerical features provided complementary structural signals.
+Character-level TF-IDF (`char_wb`) proved especially effective for handling informal language and misspellings, while engineered numerical features provided complementary structural signals.
 
 ---
 
