@@ -70,7 +70,7 @@ Several practical NLP challenges were present:
 
 * Significant class imbalance across target categories (~21:1 class imbalance ratio)
 * Informal and noisy user-generated text
-* High-dimensional sparse feature spaces
+* Sparse meta=data feature spaces
 * Minority-class sensitivity under Macro F1 evaluation
 * Overlapping linguistic patterns between semantically similar classes
 
