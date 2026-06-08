@@ -64,7 +64,7 @@ Evaluation & Interpretation
 
 ## Problem Context
 
-The dataset contained **198,000 comments** across 15 features, including engagement signals (`upvote`, `downvote`, emoticon counts), automated system indicators (`if_1`, `if_2`), demographic metadata (`race`, `religion`, `gender`), and the raw comment text.
+The dataset contained **198,000 comments** across 14 features, including engagement signals (`upvote`, `downvote`, emoticon counts), automated system indicators (`if_1`, `if_2`), demographic metadata (`race`, `religion`, `gender`), and the raw comment text.
 
 Several practical NLP challenges were present:
 
