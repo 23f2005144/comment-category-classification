@@ -244,7 +244,7 @@ Character-level TF-IDF improved robustness against informal language, misspellin
 
 ### Final Sparse Representation
 
-The final tuned feature space contained approximately **75,000 sparse TF-IDF features**, combining word-level and character-level representations with tuned vocabulary limits.
+The final tuned feature space contained approximately **125K sparse TF-IDF features**, combining word-level and character-level representations with tuned vocabulary limits.
 
 ### Why Dimensionality Reduction Was Not Applied
 
